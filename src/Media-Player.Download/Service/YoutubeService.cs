@@ -52,15 +52,27 @@ namespace Media_Player.Download.Service
         /// <param name="url">網址</param>
         public async Task DownloadAsync(string url)
         {
-            var youtube = new YoutubeClient();
+            if (string.IsNullOrEmpty(url))
+                throw new ArgumentNullException(nameof(url));
 
-            await GetSetInfoAsync(youtube, url);
+            try
+            {
+                var youtube = new YoutubeClient();
 
-            StreamManifest streamManifest = await youtube.Videos.Streams.GetManifestAsync(url);
+                await GetSetInfoAsync(youtube, url);
 
-            IStreamInfo streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+                StreamManifest streamManifest = await youtube.Videos.Streams.GetManifestAsync(url);
 
-            await youtubeRepo.SaveAsync(youtube, streamInfo);
+                IStreamInfo streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+
+                string guid = Guid.NewGuid().ToString().Replace("-", "");
+
+                await youtubeRepo.SaveAsync(youtube, streamInfo, guid);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace Media_Player.Download.Repository
         /// <param name="youtube"></param>
         /// <param name="streamInfo"></param>
         /// <returns></returns>
-        Task SaveAsync(YoutubeClient youtube, IStreamInfo streamInfo);
+        Task SaveAsync(YoutubeClient youtube, IStreamInfo streamInfo, string guid);
     }
 
     public class YoutubeRepoistory : IYoutubeRepoistory
@@ -20,7 +20,7 @@ namespace Media_Player.Download.Repository
         /// 檢查目錄是否存在，不存在就建立
         /// </summary>
         /// <param name="path">目錄路徑</param>
-        private void CheckDirectory(string path)
+        private static void CheckDirectory(string path)
         {
             bool dirExists = Directory.Exists(path);
 
@@ -34,12 +34,12 @@ namespace Media_Player.Download.Repository
         /// <param name="youtube"></param>
         /// <param name="streamInfo"></param>
         /// <returns></returns>
-        public async Task SaveAsync(YoutubeClient youtube, IStreamInfo streamInfo)
+        public async Task SaveAsync(YoutubeClient youtube, IStreamInfo streamInfo, string guid)
         {
             CheckDirectory(@"./AppData");
 
             await youtube.Videos.Streams.DownloadAsync(streamInfo,
-                @$"./AppData/video.{streamInfo.Container}");
+                @$"./AppData/{guid}.{streamInfo.Container}");
         }
     }
 }
